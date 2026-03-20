@@ -19,3 +19,7 @@
 ## 4. RGB_led_mqtt.py --> for RGB control widget 
    ### MQTT Topic  
        TOPIC_RGB = b"factory/device1/rgb1/set"
+
+## 5. voltemter_adc_mqtt.py --> for voltmeter widget (also for sensor / LCD)
+   ### MQTT Topic  
+       TOPIC_VOLT = b"factory/device1/voltage1"
