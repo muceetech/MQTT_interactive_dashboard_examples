@@ -11,3 +11,7 @@
 ## 2. Led_pwm_mqtt.py --> for brightness control widget (slider_PWM)  
    ### MQTT Topic  
        TOPIC_BRIGHTNESS = b"factory/device1/led1/brightness"
+
+## 3. Servo_pwm.py --> for servo motor angle control widget 
+   ### MQTT Topic  
+       TOPIC_SERVO = b"factory/device1/servo1/set"
