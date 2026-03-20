@@ -9,5 +9,5 @@
        TOPIC_DIGITAL_STATUS = b"factory/device1/di1/status"   --> set digital widget status "0/1" 0 - RED / 1 - GREEN
   
 2. Led_pwm_mqtt.py --> for brightness control widget (slider_PWM)  
-   #Topic 
+   #Topic  
        TOPIC_BRIGHTNESS = b"factory/device1/led1/brightness"
