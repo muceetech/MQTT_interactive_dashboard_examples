@@ -1,4 +1,4 @@
-1. Led_relay_mqtt.py --> for relay widget  
+## 1. Led_relay_mqtt.py --> for relay widget  
   MQTT_BROKER = "broker.hivemq.com"  (dont change this in program)  
   CLIENT_ID = "esp32_device1"         (optional)  
 
@@ -8,6 +8,6 @@
        TOPIC_RELAY_STATUS = b"factory/device1/relay1/status"  --> get relay widget status
        TOPIC_DIGITAL_STATUS = b"factory/device1/di1/status"   --> set digital widget status "0/1" 0 - RED / 1 - GREEN
   
-2. Led_pwm_mqtt.py --> for brightness control widget (slider_PWM)  
-   # MQTT Topic  
+## 2. Led_pwm_mqtt.py --> for brightness control widget (slider_PWM)  
+   ### MQTT Topic  
        TOPIC_BRIGHTNESS = b"factory/device1/led1/brightness"
