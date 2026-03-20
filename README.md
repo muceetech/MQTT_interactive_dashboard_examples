@@ -15,3 +15,7 @@
 ## 3. Servo_pwm.py --> for servo motor angle control widget 
    ### MQTT Topic  
        TOPIC_SERVO = b"factory/device1/servo1/set"
+
+## 4. RGB_led_mqtt.py --> for RGB control widget 
+   ### MQTT Topic  
+       TOPIC_RGB = b"factory/device1/rgb1/set"
