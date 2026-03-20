@@ -20,10 +20,10 @@
    ### MQTT Topic  
        TOPIC_RGB = b"factory/device1/rgb1/set"
 
-## 5. distance_sensor_mqtt.py --> for sensor widget 
-   ### MQTT Topic  
-       TOPIC_SENSOR = b"factory/device1/sensor1"
-
 ## 5. voltemter_adc_mqtt.py --> for voltmeter widget (also for sensor / LCD)
    ### MQTT Topic  
        TOPIC_VOLT = b"factory/device1/voltage1"
+
+## 6. distance_sensor_mqtt.py --> for sensor widget 
+   ### MQTT Topic  
+       TOPIC_SENSOR = b"factory/device1/sensor1"
