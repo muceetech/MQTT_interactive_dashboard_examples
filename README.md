@@ -1,6 +1,6 @@
 1. Led_relay_mqtt.py --> for relay widget
-  MQTT_BROKER = "broker.hivemq.com"  (dont change this in program)
-  CLIENT_ID = "esp32_device1"         (optional)
+  MQTT_BROKER = "broker.hivemq.com"  (dont change this in program)  
+  CLIENT_ID = "esp32_device1"         (optional)  
 
        change the topic "factory/device1" only.  other values shouldnot be changed which will affect the widget values
        # Topics
