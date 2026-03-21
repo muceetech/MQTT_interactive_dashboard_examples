@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic SCADA Dashboard</title>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<style>
+body {
+  background: #0f172a;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+h1 {
+  margin: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  gap: 40px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.traffic-box {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.light {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 10px auto;
+  opacity: 0.2;
+  transition: all 0.3s ease;
+}
+
+.red { background: red; }
+.yellow { background: yellow; }
+.green { background: lime; }
+
+.active {
+  opacity: 1 !important;
+  box-shadow: 0 0 20px currentColor;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.controls {
+  margin-top: 40px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.greenBtn { background: green; color: white; }
+.redBtn { background: red; color: white; }
+
+</style>
+</head>
+<body>
+
+<h1>🚦 Traffic SCADA Dashboard</h1>
+
+<div class="grid">
+  <div class="traffic-box" id="road1">
+    <h3>Road 1</h3>
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="status">Status: --</div>
+  </div>
+
+  <div class="traffic-box" id="road2">
+    <h3>Road 2</h3>
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="status">Status: --</div>
+  </div>
+
+  <div class="traffic-box" id="road3">
+    <h3>Road 3</h3>
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="status">Status: --</div>
+  </div>
+
+  <div class="traffic-box" id="road4">
+    <h3>Road 4</h3>
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="status">Status: --</div>
+  </div>
+</div>
+
+<div class="controls">
+  <h2>Manual Control</h2>
+  <button class="greenBtn" onclick="setAllGreen()">All Green</button>
+  <button class="redBtn" onclick="setAllRed()">All Red</button>
+</div>
+
+<script>
+const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+
+client.on("connect", () => {
+  console.log("Connected");
+  client.subscribe("traffic/system");
+});
+
+function updateUI(road, color) {
+  const box = document.getElementById(road);
+
+  box.querySelectorAll(".light").forEach(l => l.classList.remove("active"));
+
+  box.querySelector("." + color).classList.add("active");
+
+  box.querySelector(".status").innerText = "Status: " + color.toUpperCase();
+}
+
+client.on("message", (topic, message) => {
+  const data = JSON.parse(message.toString());
+
+  for (let road in data) {
+    updateUI(road, data[road]);
+  }
+});
+
+function publishState(state) {
+  client.publish("traffic/system", JSON.stringify(state));
+}
+
+function setAllGreen() {
+  publishState({
+    road1: "green",
+    road2: "green",
+    road3: "green",
+    road4: "green"
+  });
+}
+
+function setAllRed() {
+  publishState({
+    road1: "red",
+    road2: "red",
+    road3: "red",
+    road4: "red"
+  });
+}
+
+// AUTO DEMO ANIMATION
+let cycle = [
+  {road1:"green", road2:"red", road3:"red", road4:"red"},
+  {road1:"yellow", road2:"red", road3:"red", road4:"red"},
+  {road1:"red", road2:"green", road3:"red", road4:"red"},
+  {road1:"red", road2:"yellow", road3:"red", road4:"red"},
+  {road1:"red", road2:"red", road3:"green", road4:"red"},
+  {road1:"red", road2:"red", road3:"yellow", road4:"red"},
+  {road1:"red", road2:"red", road3:"red", road4:"green"},
+  {road1:"red", road2:"red", road3:"red", road4:"yellow"}
+];
+
+let i = 0;
+setInterval(() => {
+  publishState(cycle[i]);
+  i = (i + 1) % cycle.length;
+}, 4000);
+
+</script>
+
+</body>
+</html>
