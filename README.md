@@ -31,3 +31,8 @@
 ## 7. stepper_motor_mqtt.py --> for motor widget 
    ### MQTT Topic  
        TOPIC_SENSOR = b"factory/device1/motor1/set"
+
+## 8. Multisensor_LCD_MQTT.py --> for LCD widget 
+       bmp180.py --> library file for BMP180 sensor in wokwi. add this file in wokwi project
+   ### MQTT Topic  
+       TOPIC_LCD = b"factory/device1/lcd1/text"
