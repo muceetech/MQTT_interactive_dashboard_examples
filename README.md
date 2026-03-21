@@ -27,3 +27,7 @@
 ## 6. distance_sensor_mqtt.py --> for sensor widget 
    ### MQTT Topic  
        TOPIC_SENSOR = b"factory/device1/sensor1"
+
+## 7. stepper_motor_mqtt.py --> for motor widget 
+   ### MQTT Topic  
+       TOPIC_SENSOR = b"factory/device1/motor1/set"
