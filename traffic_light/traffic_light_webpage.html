@@ -1,0 +1,220 @@
+<div style="text-align:center;">
+
+<h2 style="color:Black;">🚦 IOT based Traffic Light control</h2>
+
+<div id="map" style="position:relative; display:inline-block;">
+
+  <!-- IMAGE -->
+  <img src="https://i.ibb.co/gbYm1PKx/traffic-light-IOT-2.png" style="width:600px;">
+
+  <!-- ROAD 1 -->
+  <div class="signal" id="road1" style="top:7%; left:32.5%;">
+    <div class="red"></div>
+    <div class="yellow"></div>
+    <div class="green"></div>
+  </div>
+
+  <!-- ROAD 2 -->
+  <div class="signal" id="road2" style="top:4.5%; left:64%;">
+    <div class="red"></div>
+    <div class="yellow"></div>
+    <div class="green"></div>
+  </div>
+
+  <!-- ROAD 3 -->
+  <div class="signal" id="road3" style="top:75.5%; left:75.5%;">
+    <div class="red"></div>
+    <div class="yellow"></div>
+    <div class="green"></div>
+  </div>
+
+  <!-- ROAD 4 -->
+  <div class="signal" id="road4" style="top:82%; left:32.5%;">
+    <div class="red"></div>
+    <div class="yellow"></div>
+    <div class="green"></div>
+  </div>
+
+</div>
+
+<br><br>
+
+<!-- MODE SELECT -->
+<label style="font-size:18px;">
+  Mode:
+  <select id="modeSelect">
+    <option value="manual">Manual</option>
+    <option value="auto">Auto</option>
+  </select>
+</label>
+
+<br><br>
+
+<!-- BUTTONS -->
+<button id="btn1">Road 1 GO</button>
+<button id="btn2">Road 2 GO</button>
+<button id="btn3">Road 3 GO</button>
+<button id="btn4">Road 4 GO</button>
+<button id="btnStop">ALL STOP</button>
+
+</div>
+
+<!-- STYLE -->
+<style>
+.signal {
+  position: absolute;
+}
+
+.signal div {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin: 2px;
+  opacity: 0.2;
+  transition: 0.3s;
+}
+
+.red { background: red; }
+.yellow { background: yellow; }
+.green { background: lime; }
+
+.active {
+  opacity: 1 !important;
+  box-shadow: 0 0 12px currentColor;
+}
+</style>
+
+<!-- MQTT -->
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script>
+const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+
+let mode = "manual";
+let autoInterval = null;
+let step = 0;
+
+client.on("connect", () => {
+  console.log("MQTT Connected ✅");
+  client.subscribe("traffic/system");
+});
+
+/* ---------- MANUAL CONTROL ---------- */
+
+function setRoad(activeRoad) {
+
+  if (mode !== "manual") {
+    console.log("Manual disabled in AUTO mode");
+    return;
+  }
+
+  console.log("Manual:", activeRoad);
+
+  let state = {
+    road1: "red",
+    road2: "red",
+    road3: "red",
+    road4: "red"
+  };
+
+  state[activeRoad] = "green";
+
+  client.publish("traffic/system", JSON.stringify(state));
+}
+
+function allRed() {
+  console.log("ALL STOP");
+
+  client.publish("traffic/system", JSON.stringify({
+    road1: "red",
+    road2: "red",
+    road3: "red",
+    road4: "red"
+  }));
+}
+
+/* ---------- AUTO MODE ---------- */
+
+const sequence = [
+  { road1: "green", road2: "red", road3: "red", road4: "red" },
+  { road1: "yellow", road2: "red", road3: "red", road4: "red" },
+
+  { road1: "red", road2: "green", road3: "red", road4: "red" },
+  { road1: "red", road2: "yellow", road3: "red", road4: "red" },
+
+  { road1: "red", road2: "red", road3: "green", road4: "red" },
+  { road1: "red", road2: "red", road3: "yellow", road4: "red" },
+
+  { road1: "red", road2: "red", road3: "red", road4: "green" },
+  { road1: "red", road2: "red", road3: "red", road4: "yellow" }
+];
+
+function startAuto() {
+  console.log("AUTO START");
+
+  autoInterval = setInterval(() => {
+    client.publish("traffic/system", JSON.stringify(sequence[step]));
+    step = (step + 1) % sequence.length;
+  }, 3000);
+}
+
+function stopAuto() {
+  console.log("AUTO STOP");
+  clearInterval(autoInterval);
+}
+
+/* ---------- MODE SWITCH ---------- */
+
+function setMode(newMode) {
+  mode = newMode;
+  console.log("Mode:", mode);
+
+  if (mode === "auto") {
+    startAuto();
+  } else {
+    stopAuto();
+  }
+}
+
+/* ---------- UI UPDATE ---------- */
+
+function updateSignal(road, color) {
+  const el = document.getElementById(road);
+  if (!el) return;
+
+  el.querySelectorAll("div").forEach(l => l.classList.remove("active"));
+  el.querySelector("." + color).classList.add("active");
+}
+
+/* ---------- MQTT RECEIVE ---------- */
+
+client.on("message", (topic, message) => {
+  const data = JSON.parse(message.toString());
+  console.log("MQTT DATA:", data);
+
+  for (let road in data) {
+    updateSignal(road, data[road]);
+  }
+});
+
+/* ---------- WEBSITE BUILDER FIX ---------- */
+
+setTimeout(() => {
+
+  // Buttons
+  document.getElementById("btn1").onclick = () => setRoad("road1");
+  document.getElementById("btn2").onclick = () => setRoad("road2");
+  document.getElementById("btn3").onclick = () => setRoad("road3");
+  document.getElementById("btn4").onclick = () => setRoad("road4");
+  document.getElementById("btnStop").onclick = allRed;
+
+  // Mode selector
+  document.getElementById("modeSelect").onchange = (e) => {
+    setMode(e.target.value);
+  };
+
+  console.log("UI Ready ✅");
+
+}, 1000);
+
+</script>
